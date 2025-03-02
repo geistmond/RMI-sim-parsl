@@ -2,7 +2,6 @@
 
 from numpy import zeros, sqrt, arange, array, savetxt, vstack
 from math import exp, pi, cos, sin
-from random import random, randint, uniform
 from multiprocessing import Pool
 from pylab import plot, title, xlabel, ylabel, \
     legend, show, savefig, xlim
@@ -12,6 +11,7 @@ import datetime
 
 from parsl.configs.local_threads import config
 from parsl.app.app import bash_app, python_app
+import secrets
 
 # basic parsl config
 parsl.load(config)
@@ -90,7 +90,7 @@ def calcsigma(c, cpts):
     for x in range(resample):
         bootci = 0.0
         for y in range(resample):
-            z = randint(0, resample - 1)
+            z = secrets.SystemRandom().randint(0, resample - 1)
             bootci += cpts[z]
         bootci /= resample
         bootc.append(bootci)
@@ -130,17 +130,17 @@ def XYmcsim(T):
 
     for k in range(steps):
         # Choose random spin
-        i = randint(0, size - 1)
-        j = randint(0, size - 1)
+        i = secrets.SystemRandom().randint(0, size - 1)
+        j = secrets.SystemRandom().randint(0, size - 1)
         s = L[i, j]
         # Generate random configuration
-        config = uniform(0, 2 * pi)
+        config = secrets.SystemRandom().uniform(0, 2 * pi)
         # Calculate change in energy:
         dE = calcdE(J, L, s, config, i, j)
         # Calculate Boltzmann probability
         P = exp(-beta * dE)
         # Accept or reject the spin
-        if P > 1 or random() < P:
+        if P > 1 or secrets.SystemRandom().random() < P:
             L[i, j] = config
             E += dE
         if equilibrium_test == 'yes':
@@ -186,17 +186,17 @@ def XYunionsim(T):
 
     for k in range(steps):
         # Choose random spin
-        i = randint(0, size - 1)
-        j = randint(0, size - 1)
+        i = secrets.SystemRandom().randint(0, size - 1)
+        j = secrets.SystemRandom().randint(0, size - 1)
         s = L[i, j]
         # Generate random configuration
-        config = uniform(0, 2 * pi)
+        config = secrets.SystemRandom().uniform(0, 2 * pi)
         # Calculate change in energy:
         dE = 2 * calcdE(J, L, s, config, i, j)
         # Calculate Boltzmann probability
         P = exp(-beta * dE)
         # Accept or reject the spin
-        if P > 1 or random() < P:
+        if P > 1 or secrets.SystemRandom().random() < P:
             L[i, j] = config
             E += dE
         # Record raw data every sweep
@@ -243,13 +243,13 @@ def XYreplicasim(T):
     for k in range(steps):
 
         # Choose random spin
-        i = randint(0, size - 1)
-        j = randint(0, size - 1)
+        i = secrets.SystemRandom().randint(0, size - 1)
+        j = secrets.SystemRandom().randint(0, size - 1)
         s = L1[i, j]
         r = L2[i, j]
         # Generate random configuration
-        config = uniform(0, 2 * pi)
-        config2 = uniform(0, 2 * pi)
+        config = secrets.SystemRandom().uniform(0, 2 * pi)
+        config2 = secrets.SystemRandom().uniform(0, 2 * pi)
         if j < bound:
             config2 = config
         # Calculate change in energy:
@@ -259,7 +259,7 @@ def XYreplicasim(T):
         # Calculate Boltzmann probability
         P = exp(-beta * dE)
         # Accept or reject the spin
-        if P > 1 or random() < P:
+        if P > 1 or secrets.SystemRandom().random() < P:
             E += dE
             L1[i, j] = config
             L2[i, j] = config2
